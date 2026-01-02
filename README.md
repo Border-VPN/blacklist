@@ -1,2 +1,12 @@
 # bedolagam-ban
 Всем бедолагам привет!
+
+
+Настройка:
+nano .env
+
+#Чс
+BLACKLIST_CHECK_ENABLED=false
+BLACKLIST_GITHUB_URL=https://raw.githubusercontent.com/.../blacklist.txt](https://raw.githubusercontent.com/nerioff1337/bedolagam-ban/refs/heads/main/blacklist.txt
+BLACKLIST_UPDATE_INTERVAL_HOURS=1
+BLACKLIST_IGNORE_ADMINS=true
