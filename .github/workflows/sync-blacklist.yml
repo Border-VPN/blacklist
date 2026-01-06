@@ -18,11 +18,17 @@ jobs:
               with:
                   ref: main
 
-            - name: Checkout upstream repository
+            - name: Checkout upstream repository (BEDOLAGA-DEV/VPN-BLACKLIST)
               uses: actions/checkout@v4
               with:
                   repository: "BEDOLAGA-DEV/VPN-BLACKLIST"
-                  path: upstream
+                  path: upstream-bedolaga
+
+            - name: Checkout upstream repository (Blin4ickUSE/ban-vpn)
+              uses: actions/checkout@v4
+              with:
+                  repository: "Blin4ickUSE/ban-vpn"
+                  path: upstream-blin4ick
 
             - name: Set up Python
               uses: actions/setup-python@v4
@@ -31,7 +37,8 @@ jobs:
 
             - name: Merge blacklists
               run: |
-                  python scripts/merge_blacklist.py --source upstream/blacklist.txt
+                  python scripts/merge_blacklist.py --source upstream-bedolaga/blacklist.txt
+                  python scripts/merge_blacklist.py --source upstream-blin4ick/blacklist.txt
 
             - name: Validate merged blacklist
               run: |
@@ -41,19 +48,19 @@ jobs:
               if: env.PUSH_DIRECT == 'true'
               uses: EndBug/add-and-commit@v9
               with:
-                  message: "chore: sync blacklist from BEDOLAGA-DEV/VPN-BLACKLIST"
+                  message: "chore: sync blacklist from upstream repositories"
                   add: "blacklist.txt"
                   push: true
 
             - name: Create Pull Request if changes (default behavior)
               if: env.PUSH_DIRECT != 'true'
-              uses: peter-evans/create-pull-request@v5
+              uses: peter-evans/create-pull-request@v8
               with:
-                  commit-message: "chore: sync blacklist from BEDOLAGA-DEV/VPN-BLACKLIST"
+                  commit-message: "chore: sync blacklist from upstream repositories"
                   branch: "auto/sync-blacklist-${{ github.run_id }}"
-                  title: "Sync blacklist from BEDOLAGA-DEV/VPN-BLACKLIST"
+                  title: "Sync blacklist"
                   body: |
-                      This PR merges the upstream `blacklist.txt` from `BEDOLAGA-DEV/VPN-BLACKLIST` into this repository, removes duplicates and normalizes entries.
+                      This PR merges the upstream `blacklist.txt` from `BEDOLAGA-DEV/VPN-BLACKLIST` and `Blin4ickUSE/ban-vpn` into this repository, removes duplicates and normalizes entries.
 
                       Automated job: schedule every 24 hours.
 
