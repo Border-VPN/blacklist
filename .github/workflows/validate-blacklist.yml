@@ -1,0 +1,27 @@
+name: Validate blacklist
+
+on:
+    pull_request:
+        paths:
+            - "blacklist.txt"
+            - ".github/workflows/**"
+    push:
+        branches: [main]
+        paths:
+            - "blacklist.txt"
+
+jobs:
+    validate:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v4
+              with:
+                  python-version: "3.x"
+
+            - name: Run validator
+              run: |
+                  python scripts/validate_blacklist.py
