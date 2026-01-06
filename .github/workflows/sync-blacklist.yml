@@ -1,0 +1,60 @@
+name: Sync blacklist from upstream
+
+on:
+    schedule:
+        - cron: "0 0 * * *" # every 24 hours at 00:00 UTC
+    workflow_dispatch: {}
+
+jobs:
+    sync:
+        runs-on: ubuntu-latest
+        env:
+            # Set this secret to 'true' to push directly to main (dangerous).
+            # If unset or not 'true' the workflow will create a PR instead.
+            PUSH_DIRECT: false
+        steps:
+            - name: Checkout this repository
+              uses: actions/checkout@v4
+              with:
+                  ref: main
+
+            - name: Checkout upstream repository
+              uses: actions/checkout@v4
+              with:
+                  repository: "BEDOLAGA-DEV/VPN-BLACKLIST"
+                  path: upstream
+
+            - name: Set up Python
+              uses: actions/setup-python@v4
+              with:
+                  python-version: "3.x"
+
+            - name: Merge blacklists
+              run: |
+                  python scripts/merge_blacklist.py --source upstream/blacklist.txt
+
+            - name: Validate merged blacklist
+              run: |
+                  python scripts/validate_blacklist.py
+
+            - name: Commit and push directly to main (if enabled)
+              if: env.PUSH_DIRECT == 'true'
+              uses: EndBug/add-and-commit@v9
+              with:
+                  message: "chore: sync blacklist from BEDOLAGA-DEV/VPN-BLACKLIST"
+                  add: "blacklist.txt"
+                  push: true
+
+            - name: Create Pull Request if changes (default behavior)
+              if: env.PUSH_DIRECT != 'true'
+              uses: peter-evans/create-pull-request@v5
+              with:
+                  commit-message: "chore: sync blacklist from BEDOLAGA-DEV/VPN-BLACKLIST"
+                  branch: "auto/sync-blacklist-${{ github.run_id }}"
+                  title: "Sync blacklist from BEDOLAGA-DEV/VPN-BLACKLIST"
+                  body: |
+                      This PR merges the upstream `blacklist.txt` from `BEDOLAGA-DEV/VPN-BLACKLIST` into this repository, removes duplicates and normalizes entries.
+
+                      Automated job: schedule every 24 hours.
+
+                  labels: "auto-sync"

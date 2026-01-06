@@ -33,3 +33,15 @@ python scripts/validate_blacklist.py
 ```
 
 Если проверка завершится с ошибкой — исправьте проблемные строки в `blacklist.txt` и повторите PR.
+
+## CI/CD — автоматическая синхронизация из BEDOLAGA-DEV/VPN-BLACKLIST
+
+Добавлен workflow `.github/workflows/sync-blacklist.yml`, который выполняется по расписанию (каждые 24 часа) и автоматически:
+
+1. Получает `blacklist.txt` из репозитория `BEDOLAGA-DEV/VPN-BLACKLIST`.
+2. Объединяет его с текущим `blacklist.txt`, нормализует записи и убирает дубликаты (скрипт: `scripts/merge_blacklist.py`).
+   - **Важно:** inline‑комментарии (всё после `#` на строке) сохраняются. Для дубликатов сохраняется комментарий из первой встреченной записи (обычно из локального файла, затем из upstream).
+3. Запускает валидацию (`scripts/validate_blacklist.py`).
+4. Создаёт Pull Request с изменениями (по умолчанию) или — при установке секрета `PUSH_DIRECT=true` — пушит изменения прямо в `main`.
+
+Вы можете запустить задачу вручную через Actions -> Sync blacklist -> Run workflow (workflow_dispatch).

@@ -1,0 +1,6 @@
+# Upstream blacklist sample
+123456789 # upstream new id
+7734949744 # upstream duplicate (should keep local comment)
+@ExampleUser # upstream username
+@exampleUser # duplicate username different case
+999999999 # only upstream
