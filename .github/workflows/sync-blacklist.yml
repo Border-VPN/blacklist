@@ -30,6 +30,12 @@ jobs:
                   repository: "Blin4ickUSE/ban-vpn"
                   path: upstream-blin4ick
 
+            - name: Checkout upstream repository (nerioff1337/bedolagam-ban)
+              uses: actions/checkout@v4
+              with:
+                  repository: "nerioff1337/bedolagam-ban"
+                  path: upstream-nerioff
+
             - name: Set up Python
               uses: actions/setup-python@v4
               with:
@@ -39,6 +45,7 @@ jobs:
               run: |
                   python scripts/merge_blacklist.py --source upstream-bedolaga/blacklist.txt
                   python scripts/merge_blacklist.py --source upstream-blin4ick/blacklist.txt
+                  python scripts/merge_blacklist.py --source upstream-nerioff/blacklist.txt
 
             - name: Validate merged blacklist
               run: |
@@ -60,7 +67,7 @@ jobs:
                   branch: "auto/sync-blacklist-${{ github.run_id }}"
                   title: "Sync blacklist"
                   body: |
-                      This PR merges the upstream `blacklist.txt` from `BEDOLAGA-DEV/VPN-BLACKLIST` and `Blin4ickUSE/ban-vpn` into this repository, removes duplicates and normalizes entries.
+                      This PR merges the upstream `blacklist.txt` from `BEDOLAGA-DEV/VPN-BLACKLIST`, `Blin4ickUSE/ban-vpn` and `nerioff1337/bedolagam-ban` into this repository, removes duplicates and normalizes entries.
 
                       Automated job: schedule every 24 hours.
 
